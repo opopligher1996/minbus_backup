@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.example.cheukleong.minibus_project.MainActivity">
+
+    <TextView
+        android:id="@+id/Show_Location"
+        android:layout_width="wrap_content"
+        android:layout_height="30dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:text="Location =" />
+
+    <TextView
+        android:id="@+id/Show_Routid"
+        android:layout_width="wrap_content"
+        android:layout_height="30dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/Show_Location"
+        android:text="Routeid = " />
+
+    <TextView
+        android:id="@+id/Show_Station"
+        android:layout_width="wrap_content"
+        android:layout_height="30dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/Show_Routid"
+        android:text="Station = " />
+
+    <TextView
+        android:id="@+id/Show_Journeyid"
+        android:layout_width="wrap_content"
+        android:layout_height="30dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/Show_Station"
+        android:text="Journeyid = " />
+
+    <Button
+        android:id="@+id/show_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/startButton"
+        android:layout_alignRight="@+id/startButton"
+        android:layout_below="@+id/startButton"
+        android:text="Show GPS"
+        tools:layout_editor_absoluteX="141dp"
+        tools:layout_editor_absoluteY="297dp" />
+
+    <TextView
+        android:id="@+id/Emerge_Setting"
+        android:layout_width="383dp"
+        android:layout_height="50dp"
+        android:layout_alignStart="@+id/show_button"
+        android:layout_below="@+id/show_button"
+        android:layout_marginStart="-148dp"
+        android:text="Emerge Setting :  Don't tunch the emerge Emerge button" />
+
+    <Button
+        android:id="@+id/startButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/Car_ID"
+        android:layout_centerHorizontal="true"
+        android:text="Start"
+        tools:layout_editor_absoluteX="52dp"
+        tools:layout_editor_absoluteY="368dp" />
+
+    <EditText
+        android:id="@+id/Car_ID"
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        android:layout_below="@+id/Route"
+        android:layout_toRightOf="@+id/init"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:text="Car_ID" />
+
+    <EditText
+        android:id="@+id/Route"
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        android:layout_alignLeft="@+id/Car_ID"
+        android:layout_below="@+id/Show_Journeyid"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:text="Route" />
+
+    <Button
+        android:id="@+id/init"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/Car_ID"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/Car_ID" />
+
+    <EditText
+        android:id="@+id/editText_routeid"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/Emerge_Setting"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:text="Routeid:" />
+
+    <Button
+        android:id="@+id/Emerge_Set"
+        android:layout_width="169dp"
+        android:layout_height="wrap_content"
+        android:layout_alignEnd="@+id/Car_ID"
+        android:layout_below="@+id/Emerge_Setting"
+        android:layout_marginEnd="-81dp"
+        android:text="Emerge_Set" />
+
+</RelativeLayout>
