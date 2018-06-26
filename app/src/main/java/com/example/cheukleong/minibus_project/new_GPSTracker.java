@@ -51,7 +51,7 @@ public class new_GPSTracker extends Service
     public static int Arr_station = -1;
     public static int Pre_station = -2;
     public static boolean init=false;
-    public static int dans=30;
+    public static int dans=50;
     public int Bat_info=100;
     private Context ctx;
     public double go_station[][]={
@@ -266,14 +266,14 @@ public class new_GPSTracker extends Service
 
     public boolean Check_Quitting(double station[][]){
         if((Arr_station==0 && routeid.equals("1"))||(Arr_station==back_station.length-1 && routeid.equals("2")))
-            dans=250;
+            dans=150;
         Set_Compare_location(station[Arr_station][0],station[Arr_station][1]);
         Log.d("Gash: ","Debug distance = "+LocationDistance(Current_location,Compare_location));
         if(LocationDistance(Current_location,Compare_location)>dans) {
-            dans = 30;
+            dans = 50;
             return true;
         }
-        dans=30;
+        dans=50;
         return false;
     }
 
@@ -285,11 +285,11 @@ public class new_GPSTracker extends Service
             station = back_station;
         for(int i=0;i<station.length;i++){
             if((i==0 && routeid.equals("1"))||(i==station.length-1 && routeid.equals("2")))
-                dans=250;
+                dans=150;
             Set_Compare_location(station[i][0],station[i][1]);
             if(LocationDistance(Current_location,Compare_location)<dans)
                 return i;
-            dans = 30;
+            dans = 50;
         }
         return -1;
     }
