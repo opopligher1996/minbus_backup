@@ -4,119 +4,117 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:weightSum="8"
     tools:context="com.example.cheukleong.minibus_project.MainActivity">
+
+    <EditText
+        android:id="@+id/Car_ID"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:ems="10"
+        android:hint="車牌號碼"
+        android:inputType="textPersonName" />
+
+    <Spinner
+        android:id="@+id/route_spinner"
+        android:layout_width="match_parent"
+        android:layout_height="100px"
+        android:layout_below="@+id/Car_ID" />
 
     <TextView
         android:id="@+id/Show_Location"
-        android:layout_width="wrap_content"
+        android:layout_width="150dp"
         android:layout_height="30dp"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignTop="@+id/init"
         android:text="Location =" />
 
     <TextView
         android:id="@+id/Show_Routid"
-        android:layout_width="wrap_content"
+        android:layout_width="150dp"
         android:layout_height="30dp"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true"
+        android:layout_alignParentStart="true"
         android:layout_below="@+id/Show_Location"
         android:text="Routeid = " />
 
     <TextView
         android:id="@+id/Show_Station"
-        android:layout_width="wrap_content"
+        android:layout_width="150dp"
         android:layout_height="30dp"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true"
-        android:layout_below="@+id/Show_Routid"
+        android:layout_alignParentEnd="true"
+        android:layout_alignTop="@+id/Show_Location"
         android:text="Station = " />
 
     <TextView
         android:id="@+id/Show_Journeyid"
-        android:layout_width="wrap_content"
+        android:layout_width="150dp"
         android:layout_height="30dp"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true"
-        android:layout_below="@+id/Show_Station"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@+id/Show_Location"
         android:text="Journeyid = " />
 
     <Button
         android:id="@+id/show_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/startButton"
-        android:layout_alignRight="@+id/startButton"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_alignParentStart="true"
         android:layout_below="@+id/startButton"
-        android:text="Show GPS"
+        android:text="開發人員使用"
         tools:layout_editor_absoluteX="141dp"
         tools:layout_editor_absoluteY="297dp" />
 
-    <TextView
-        android:id="@+id/Emerge_Setting"
-        android:layout_width="383dp"
-        android:layout_height="50dp"
-        android:layout_alignStart="@+id/show_button"
-        android:layout_below="@+id/show_button"
-        android:layout_marginStart="-148dp"
-        android:text="Emerge Setting :  Don't tunch the emerge Emerge button" />
-
     <Button
         android:id="@+id/startButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/Car_ID"
-        android:layout_centerHorizontal="true"
-        android:text="Start"
+        android:layout_width="100dp"
+        android:layout_height="50dp"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/route_spinner"
+        android:text="開始"
+        android:padding="5dp"
         tools:layout_editor_absoluteX="52dp"
-        tools:layout_editor_absoluteY="368dp" />
-
-    <EditText
-        android:id="@+id/Car_ID"
-        android:layout_width="wrap_content"
-        android:layout_height="50dp"
-        android:layout_below="@+id/Route"
-        android:layout_toRightOf="@+id/init"
-        android:ems="10"
-        android:inputType="textPersonName"
-        android:text="Car_ID" />
-
-    <EditText
-        android:id="@+id/Route"
-        android:layout_width="wrap_content"
-        android:layout_height="50dp"
-        android:layout_alignLeft="@+id/Car_ID"
-        android:layout_below="@+id/Show_Journeyid"
-        android:ems="10"
-        android:inputType="textPersonName"
-        android:text="Route" />
+        tools:layout_editor_absoluteY="368dp"
+        />
 
     <Button
         android:id="@+id/init"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/Car_ID"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@+id/Car_ID" />
-
-    <EditText
-        android:id="@+id/editText_routeid"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
-        android:layout_below="@+id/Emerge_Setting"
-        android:ems="10"
-        android:inputType="textPersonName"
-        android:text="Routeid:" />
+        android:layout_below="@+id/send_request_button" />
 
     <Button
-        android:id="@+id/Emerge_Set"
-        android:layout_width="169dp"
-        android:layout_height="wrap_content"
-        android:layout_alignEnd="@+id/Car_ID"
-        android:layout_below="@+id/Emerge_Setting"
-        android:layout_marginEnd="-81dp"
-        android:text="Emerge_Set" />
+        android:id="@+id/send_request_button"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/textView"
+        android:text="Testing" />
+
+    <Button
+        android:id="@+id/change_route_button"
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        android:layout_below="@+id/route_spinner"
+        android:layout_toEndOf="@+id/startButton"
+        android:padding="5dp"
+        android:text="轉線" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="184dp"
+        android:layout_height="50dp"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/show_button"
+        android:text="insertTrialLocation:" />
+
+    <CheckBox
+        android:id="@+id/insert_trial_checkBox"
+        android:layout_width="200dp"
+        android:layout_height="50dp"
+        android:layout_below="@+id/show_button"
+        android:layout_toEndOf="@+id/textView" />
 
 </RelativeLayout>

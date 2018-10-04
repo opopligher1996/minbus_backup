@@ -40,7 +40,7 @@ public class new_GPSTracker extends Service
     private LocationManager mLocationManager = null;
     private static final int LOCATION_INTERVAL = 1000;
     private static final float LOCATION_DISTANCE = 10f;
-    public static String journeyid;
+    public static String journeyid = null;
     public static String routeid;
     public static Long Station_startTime;
     public static Long Station_endTime;
@@ -54,15 +54,16 @@ public class new_GPSTracker extends Service
     public static int dans=50;
     public int Bat_info=100;
     private Context ctx;
-    public double go_station[][]={
+    public static double go_station[][]={
             {22.2837,114.1588},
             {22.2841445,114.1392645},
             {22.2836933,114.1366914},
             {22.26823162,114.12865509},
             {22.26642942,114.12825444},
+            {22.261973,114.134431},
             {22.2619,114.1319}
     };
-    double back_station[][]={
+    public static double back_station[][]={
             {22.2619,114.1319},
             {22.266572,114.128184},
             {22.269442,114.129753},
@@ -83,6 +84,7 @@ public class new_GPSTracker extends Service
         @Override
         public void onLocationChanged(Location location)
         {
+            Log.d("Gash: ","onLocationChanged");
             registerReceiver(mBatInfoReceiver, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
             Set_Current_time();
             Set_Current_location(location);
@@ -194,9 +196,9 @@ public class new_GPSTracker extends Service
         if(init)
             return;
         init=true;
-        Set_Compare_location(22.2837,114.1588);
+        Set_Compare_location(go_station[0][0],go_station[0][1]);
         double distance_start_point = LocationDistance(Current_location,Compare_location);
-        Set_Compare_location(22.2619,114.1319);
+        Set_Compare_location(go_station[go_station.length-1][0],go_station[go_station.length-1][1]);
         double distance_end_point = LocationDistance(Current_location,Compare_location);
         if(distance_start_point<distance_end_point)
             Set_routeid(1);
@@ -230,7 +232,10 @@ public class new_GPSTracker extends Service
         if(Quitting_station) {
             Log.d("Gash:","Enter reset");
             Station_endTime  = Current_time;
-            insert_station();
+            if(MainActivity.insert_trial_checked==false)
+                insert_station();
+            else
+                insert_trial_station();
             Set_Arr_station(-1);
         }
     }
@@ -288,7 +293,10 @@ public class new_GPSTracker extends Service
                 dans=150;
             Set_Compare_location(station[i][0],station[i][1]);
             if(LocationDistance(Current_location,Compare_location)<dans)
+            {
+                dans = 50;
                 return i;
+            }
             dans = 50;
         }
         return -1;
@@ -306,6 +314,49 @@ public class new_GPSTracker extends Service
         JSONObject endlocation = new JSONObject(jsonValues);
         DefaultHttpClient client = new DefaultHttpClient();
         HttpPost httppost = new HttpPost("http://128.199.88.79:3001/api/v1/minibus/insertStation");
+        try {
+            List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
+            nameValuePairs.add(new BasicNameValuePair("stationid",Station_startTime.toString()+CAR_ID+String.valueOf(Pre_station)));
+            nameValuePairs.add(new BasicNameValuePair("location", endlocation.toString()));
+            nameValuePairs.add(new BasicNameValuePair("startTime", Station_startTime.toString()));
+            nameValuePairs.add(new BasicNameValuePair("endTime", Station_endTime.toString()));
+            nameValuePairs.add(new BasicNameValuePair("journeyid", journeyid));
+            nameValuePairs.add(new BasicNameValuePair("stationOrder",String.valueOf(Pre_station)));
+
+            httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+            Log.d("httppost: ",httppost.toString());
+
+            try {
+                if (android.os.Build.VERSION.SDK_INT > 9) {
+                    StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+                    StrictMode.setThreadPolicy(policy);
+                }
+                Log.d(TAG, "Before send message");
+                HttpResponse response =client.execute(httppost);
+                Log.d(TAG, "After send message");
+                Log.d("myapp", "response " + response.getEntity());
+
+            } catch (ClientProtocolException e) {
+                Log.d("Error:","ClientProtocol");
+            } catch (IOException e) {
+                Log.d("Error:","IOException");
+            }
+        } catch (UnsupportedEncodingException e) {
+            Log.d("Error:","UnsupportedEncodingException");
+        }
+
+        Log.d("Gash:","Finish insert station");
+        return ;
+    }
+
+    private void insert_trial_station(){
+        Log.d("GASH:","Start Insert Station");
+        Map< String, Object > jsonValues = new HashMap< String, Object >();
+        jsonValues.put("x", Current_location.getLatitude());
+        jsonValues.put("y", Current_location.getLongitude());
+        JSONObject endlocation = new JSONObject(jsonValues);
+        DefaultHttpClient client = new DefaultHttpClient();
+        HttpPost httppost = new HttpPost("http://128.199.88.79:3001/api/v1/minibus/insertTrialLocation");
         try {
             List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
             nameValuePairs.add(new BasicNameValuePair("stationid",Station_startTime.toString()+CAR_ID+String.valueOf(Pre_station)));
