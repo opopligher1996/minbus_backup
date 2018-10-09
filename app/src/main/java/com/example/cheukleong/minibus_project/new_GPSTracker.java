@@ -40,6 +40,7 @@ public class new_GPSTracker extends Service
     private LocationManager mLocationManager = null;
     private static final int LOCATION_INTERVAL = 1000;
     private static final float LOCATION_DISTANCE = 10f;
+    public static int routeid_range = 1;
     public static String journeyid = null;
     public static String routeid;
     public static Long Station_startTime;
@@ -49,6 +50,7 @@ public class new_GPSTracker extends Service
     public static Location Compare_location = new Location("");
     // -1 is equal to the minbus don't arrive any station
     public static int Arr_station = -1;
+    // -2 is equal to the minibus don't arrive any station before
     public static int Pre_station = -2;
     public static boolean init=false;
     public static int dans=50;
@@ -84,17 +86,36 @@ public class new_GPSTracker extends Service
         @Override
         public void onLocationChanged(Location location)
         {
-            Log.d("Gash: ","onLocationChanged");
-            registerReceiver(mBatInfoReceiver, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+            Log.e("Gash: ","Before process onLocationChnaged");
+            Log.e("Gash: ","onLocationChanged");
+            if (journeyid==null)
+                Log.e("journeyid","null");
+            else
+                Log.e("journeyid: ",journeyid);
+
+            if(routeid==null)
+                Log.e("routeid","null");
+            else
+                Log.e("routeid",routeid);
+            Log.e("init", String.valueOf(init));
+            Log.e("routeid_range", String.valueOf(routeid_range));
+            Log.e("Arr_station", String.valueOf(Arr_station));
+            Log.e("Pre_station", String.valueOf(Pre_station));
             Set_Current_time();
             Set_Current_location(location);
             init();
             update_location();
             Check_Arrive_Station();
-            Log.d("Gash","Before Check_Quit station = "+Arr_station);
             Check_Quit_Station();
-            Log.d("Gash","After Check_Quit station = "+Arr_station);
             Check_Finish_Journey();
+            Log.e("Gash: ","After process onLocationChnaged");
+            Log.e("Gash: ","onLocationChanged");
+            Log.e("journeyid: ",journeyid);
+            Log.e("routeid",routeid);
+            Log.e("init", String.valueOf(init));
+            Log.e("routeid_range", String.valueOf(routeid_range));
+            Log.e("Arr_station", String.valueOf(Arr_station));
+            Log.e("Pre_station", String.valueOf(Pre_station));
         }
 
         @Override
@@ -307,7 +328,14 @@ public class new_GPSTracker extends Service
     }
 
     private void insert_station(){
-        Log.d("GASH:","Start Insert Station");
+        Log.e("Insert_station: ","Start Insert Station");
+        Log.e("Insert_station: ",Station_startTime.toString()+CAR_ID+String.valueOf(Pre_station));
+        Log.e("Insert_station: ", String.valueOf(Current_location.getLatitude()));
+        Log.e("Insert_station: ", String.valueOf(Current_location.getLongitude()));
+        Log.e("Insert_station", Station_startTime.toString());
+        Log.e("Insert_station",Station_endTime.toString());
+        Log.e("Insert_station",String.valueOf(Pre_station));
+        Log.e("Insert_station: ",journeyid);
         Map< String, Object > jsonValues = new HashMap< String, Object >();
         jsonValues.put("x", Current_location.getLatitude());
         jsonValues.put("y", Current_location.getLongitude());

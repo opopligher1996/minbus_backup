@@ -112,8 +112,11 @@ public class MainActivity extends Activity {
                 new_GPSTracker.go_station = get_stations(selected_item*2+1);
                 new_GPSTracker.back_station = get_stations(selected_item*2+2);
                 new_GPSTracker.CAR_ID=ID.getText().toString();
-                stopService(new Intent(context, new_GPSTracker.class));
-                startService(new Intent(context, new_GPSTracker.class));
+                new_GPSTracker.routeid_range=selected_item*2+1;
+                new_GPSTracker.init=false;
+                new_GPSTracker.journeyid=null;
+                new_GPSTracker.Arr_station = -1;
+                new_GPSTracker.Pre_station = -2;
             }
         });
 
