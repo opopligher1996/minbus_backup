@@ -9,112 +9,89 @@
 
     <EditText
         android:id="@+id/Car_ID"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_alignParentStart="true"
+        android:layout_width="162dp"
+        android:layout_height="100dp"
+        android:layout_alignEnd="@+id/route_change"
         android:layout_alignParentTop="true"
+        android:background="@null"
+        android:cursorVisible="false"
         android:ems="10"
         android:hint="車牌號碼"
-        android:inputType="textPersonName" />
+        android:inputType="textPersonName"
+        android:selectAllOnFocus="false"
+        android:textAlignment="center"
+        android:textColor="@android:color/background_dark"
+        android:textColorHint="@android:color/background_dark"
+        android:textSize="36sp"
+        android:textStyle="bold"
+        tools:layout_editor_absoluteX="120dp"
+        tools:layout_editor_absoluteY="0dp" />
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="100dp"
+        android:layout_alignParentTop="true"
+        android:layout_marginEnd="3dp"
+        android:layout_toStartOf="@+id/Car_ID"
+        android:gravity="center"
+        android:text="車牌："
+        android:textAlignment="textEnd"
+        android:textAllCaps="false"
+        android:textColor="@android:color/background_dark"
+        android:textSize="36sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/show_carid"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:layout_below="@+id/Car_ID"
+        android:layout_centerHorizontal="true"
+        android:gravity="center"
+        android:text="8X"
+        android:textColor="#095300"
+        android:textSize="160dp"
+        tools:layout_editor_absoluteX="117dp"
+        tools:layout_editor_absoluteY="100dp" />
 
     <Spinner
         android:id="@+id/route_spinner"
-        android:layout_width="match_parent"
-        android:layout_height="100px"
-        android:layout_below="@+id/Car_ID" />
+        android:layout_width="200dp"
+        android:layout_height="87dp"
+        android:layout_below="@+id/show_carid"
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/spinner"
+        android:paddingBottom="50px" />
+
+    <ImageButton
+        android:id="@+id/route_change"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textView3"
+        android:layout_centerHorizontal="true"
+        android:background="@null"
+        android:src="@drawable/button_unclicked" />
 
     <TextView
-        android:id="@+id/Show_Location"
-        android:layout_width="150dp"
-        android:layout_height="50dp"
-        android:layout_alignParentStart="true"
-        android:layout_alignTop="@+id/init"
-        android:text="Location =" />
+        android:id="@+id/textView3"
+        android:layout_width="wrap_content"
+        android:layout_height="50px"
+        android:layout_alignStart="@+id/show_carid"
+        android:layout_below="@+id/route_spinner" />
 
-    <TextView
-        android:id="@+id/Show_Routid"
-        android:layout_width="150dp"
-        android:layout_height="50dp"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/Show_Location"
-        android:text="Routeid = " />
-
-    <TextView
-        android:id="@+id/Show_Station"
-        android:layout_width="150dp"
-        android:layout_height="50dp"
-        android:layout_alignParentEnd="true"
-        android:layout_alignTop="@+id/Show_Location"
-        android:text="Station = " />
-
-    <TextView
-        android:id="@+id/Show_Journeyid"
-        android:layout_width="150dp"
-        android:layout_height="50dp"
-        android:layout_alignParentEnd="true"
-        android:layout_below="@+id/Show_Location"
-        android:text="Journeyid = " />
-
-    <Button
-        android:id="@+id/show_button"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/startButton"
-        android:text="開發人員使用"
-        tools:layout_editor_absoluteX="141dp"
-        tools:layout_editor_absoluteY="297dp" />
 
     <Button
         android:id="@+id/startButton"
-        android:layout_width="100dp"
-        android:layout_height="50dp"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/route_spinner"
-        android:text="開始"
-        android:padding="5dp"
-        tools:layout_editor_absoluteX="52dp"
-        tools:layout_editor_absoluteY="368dp"
-        />
-
-    <Button
-        android:id="@+id/init"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/send_request_button" />
-
-    <Button
-        android:id="@+id/send_request_button"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/textView"
-        android:text="Testing" />
-
-    <Button
-        android:id="@+id/change_route_button"
         android:layout_width="wrap_content"
-        android:layout_height="50dp"
-        android:layout_below="@+id/route_spinner"
-        android:layout_toEndOf="@+id/startButton"
+        android:layout_height="33dp"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@+id/Car_ID"
         android:padding="5dp"
-        android:text="轉線" />
+        android:text="開始"
+        android:visibility="invisible"
+        tools:layout_editor_absoluteX="52dp"
+        tools:layout_editor_absoluteY="368dp" />
 
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="184dp"
-        android:layout_height="50dp"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/show_button"
-        android:text="insertTrialLocation:" />
-
-    <CheckBox
-        android:id="@+id/insert_trial_checkBox"
-        android:layout_width="200dp"
-        android:layout_height="50dp"
-        android:layout_below="@+id/show_button"
-        android:layout_toEndOf="@+id/textView" />
 
 </RelativeLayout>

@@ -226,7 +226,7 @@ public class new_GPSTracker extends Service
         else
             Set_routeid(2);
         Set_journeyid();
-        insert_journey();
+//        insert_journey();
     }
 
     public void Check_Arrive_Station(){
@@ -277,7 +277,7 @@ public class new_GPSTracker extends Service
     public void Check_Finish_Journey(){
         if((Arr_station==go_station.length-1 && routeid.equals("1"))||(Arr_station==back_station.length-1 && routeid.equals("2"))){
             Set_New_Journey();
-            insert_journey();
+//            insert_journey();
         }
     }
 

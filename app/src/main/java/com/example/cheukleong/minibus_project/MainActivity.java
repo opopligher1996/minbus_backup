@@ -1,22 +1,34 @@
 package com.example.cheukleong.minibus_project;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.provider.Settings;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.provider.Settings.System;
+import android.widget.Toast;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -55,39 +67,37 @@ import static com.example.cheukleong.minibus_project.new_GPSTracker.journeyid;
 
 public class MainActivity extends Activity {
     private Button start;
-    private Button show;
-    private Button send_request;
-    private TextView Show_Station;
-    private TextView Show_Routeid;
-    private TextView Show_Journeyid;
-    private TextView Show_Location;
+    private TextView show_CarId;
+    private TextView CarID;
     private EditText ID;
     private EditText Route;
-    private EditText editText_routeid;
     private Spinner route_spinner;
+    private ImageButton route_change;
     private CheckBox insert_trial_checkBox;
+    private String choose_route = "8x";
+    private List<String> route_ids = new ArrayList<String>();
     public static boolean insert_trial_checked = false;
     public final Context context=this;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ID=findViewById(R.id.Car_ID);
         start=findViewById(R.id.startButton);
-        show=findViewById(R.id.show_button);
-        send_request=findViewById(R.id.send_request_button);
-        Show_Location=findViewById(R.id.Show_Location);
-        Show_Station=findViewById(R.id.Show_Station);
-        Show_Routeid=findViewById(R.id.Show_Routid);
-        Show_Journeyid=findViewById(R.id.Show_Journeyid);
         route_spinner=findViewById(R.id.route_spinner);
-        insert_trial_checkBox=findViewById(R.id.insert_trial_checkBox);
 
-        final String[] route_ids = {"8X","36M"};
-        ArrayAdapter<String> route_ids_List = new ArrayAdapter<>(MainActivity.this,
-                android.R.layout.simple_spinner_dropdown_item,
-                route_ids);
-        route_spinner.setAdapter(route_ids_List);
+        show_CarId = findViewById(R.id.show_carid);
+        route_spinner = findViewById(R.id.route_spinner);
+        route_change = findViewById(R.id.route_change);
+        ID.setText(Build.ID);
+        route_ids.add("線路");
+        route_ids.add("8x");
+        route_ids.add("8");
+        route_ids.add("8s");
+        route_ids.add("5");
+        MySpinnerAdapter adapter = new MySpinnerAdapter();
+        route_spinner.setAdapter(adapter);
 
 
         start.setOnClickListener(new View.OnClickListener() {
@@ -99,55 +109,75 @@ public class MainActivity extends Activity {
             }
         });
 
-        send_request.setOnClickListener(new View.OnClickListener() {
+        route_change.setOnTouchListener(new View.OnTouchListener() {
             @Override
-            public void onClick(View view) {
-                Log.d("GASH:","Start Testing");
-                if(new_GPSTracker.journeyid!=null)
-                {
-                    Log.e("Gash : ","journeyid is not null");
-                    delete_jorney(new_GPSTracker.journeyid);
+            public boolean onTouch(View v, MotionEvent event)
+            {
+                if(event.getAction() == MotionEvent.ACTION_DOWN) {
+                    route_change.setImageResource(R.drawable.button_clicked);
+                } else if (event.getAction() == MotionEvent.ACTION_UP) {
+
+                    route_change.setImageResource(R.drawable.button_unclicked);
+                    int item = route_spinner.getSelectedItemPosition();
+                    if(item!=0) {
+                        final String select_route = route_ids.get(item);
+                        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                        builder.setTitle("確定轉線")
+                                .setMessage("由"+choose_route+"轉為"+select_route)
+                                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        // continue with delete
+                                        if(!choose_route.equals(select_route))
+                                        {
+                                            choose_route = select_route;
+                                            show_CarId.setText(select_route);
+                                            Toast.makeText(context, "已轉" + select_route + "路線", Toast.LENGTH_SHORT).show();
+                                            change_route();
+                                        }
+                                        else
+                                        {
+                                            Toast.makeText(context, "維持" + select_route + "路線", Toast.LENGTH_SHORT).show();
+                                        }
+                                    }
+                                })
+                                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        Toast.makeText(context, "取消路線", Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+
+                        builder.show();
+                    }
+                    else
+                    {
+                        Toast.makeText(context, "你沒有選擇路線", Toast.LENGTH_SHORT).show();
+                    }
                 }
-                int selected_item = route_spinner.getSelectedItemPosition();
-                new_GPSTracker.go_station = get_stations(selected_item*2+1);
-                new_GPSTracker.back_station = get_stations(selected_item*2+2);
-                new_GPSTracker.CAR_ID=ID.getText().toString();
-                new_GPSTracker.routeid_range=selected_item*2+1;
-                new_GPSTracker.init=false;
-                new_GPSTracker.journeyid=null;
-                new_GPSTracker.Arr_station = -1;
-                new_GPSTracker.Pre_station = -2;
+                return true;
             }
         });
 
-        show.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                try{
-                    Show_Location.setText("Location: "+ Double.toString(new_GPSTracker.Current_location.getLatitude())+" "+Double.toString(new_GPSTracker.Current_location.getLongitude()));
-                    Show_Station.setText("Station: "+new_GPSTracker.Arr_station);
-                    Show_Journeyid.setText("Journeyid: "+ journeyid);
-                    Show_Routeid.setText("Routeid: "+new_GPSTracker.routeid);
 
-                }
-                catch (Exception e)
-                {
-                    Show_Location.setText("You have to start the GPSTracker first or you get error. Reason : "+e);
-                }
-            }
-        });
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1) {
+            start.callOnClick();
+        }
+    }
 
-        insert_trial_checkBox.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View view) {
-                if(insert_trial_checkBox.isChecked())
-                    insert_trial_checked = true;
-                else
-                    insert_trial_checked = false;
-            }
-        });
-
-
+    public void change_route(){
+        if(new_GPSTracker.journeyid!=null)
+        {
+            Log.e("Gash : ","journeyid is not null");
+            delete_jorney(new_GPSTracker.journeyid);
+        }
+        int selected_item = route_spinner.getSelectedItemPosition();
+        new_GPSTracker.go_station = get_stations(selected_item*2+1);
+        new_GPSTracker.back_station = get_stations(selected_item*2+2);
+        new_GPSTracker.CAR_ID=ID.getText().toString();
+        new_GPSTracker.routeid_range=selected_item*2+1;
+        new_GPSTracker.init=false;
+        new_GPSTracker.journeyid=null;
+        new_GPSTracker.Arr_station = -1;
+        new_GPSTracker.Pre_station = -2;
     }
 
     public double[][] get_stations(int routeid) {
@@ -224,4 +254,64 @@ public class MainActivity extends Activity {
         return ;
     }
 
+
+
+    class MySpinnerAdapter extends BaseAdapter {
+        @Override
+        public int getCount() {
+            return route_ids.size();
+        }
+
+        @Override
+        public Object getItem(int position) {
+            return route_ids.get(position);
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return position;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            if(position==0)
+            {
+                LinearLayout ll = new LinearLayout(MainActivity.this);
+                ll.setGravity(Gravity.CENTER);
+                TextView tv = new TextView(MainActivity.this);
+                tv.setText(route_ids.get(position));
+                tv.setTextSize(40);
+                tv.setTextColor(Color.GRAY);
+                tv.setGravity(Gravity.CENTER);
+                ll.addView(tv);
+                return ll;
+            }
+            else
+            {
+                LinearLayout ll = new LinearLayout(MainActivity.this);
+                ll.setGravity(Gravity.CENTER);
+                TextView tv = new TextView(MainActivity.this);
+                tv.setText(route_ids.get(position));
+                tv.setTextSize(40);
+                tv.setTextColor(Color.rgb(9, 83, 0));
+                tv.setGravity(Gravity.CENTER);
+                ll.addView(tv);
+                return ll;
+            }
+        }
+
+        @Override
+        public boolean isEnabled(int position){
+            if(position == 0)
+            {
+                // Disable the first item from Spinner
+                // First item will be use for hint
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
+    }
 }
