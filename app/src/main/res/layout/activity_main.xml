@@ -44,14 +44,14 @@
 
     <TextView
         android:id="@+id/show_carid"
-        android:layout_width="200dp"
+        android:layout_width="match_parent"
         android:layout_height="200dp"
         android:layout_below="@+id/Car_ID"
         android:layout_centerHorizontal="true"
         android:gravity="center"
         android:text="8X"
         android:textColor="#095300"
-        android:textSize="160dp"
+        android:textSize="120dp"
         tools:layout_editor_absoluteX="117dp"
         tools:layout_editor_absoluteY="100dp" />
 

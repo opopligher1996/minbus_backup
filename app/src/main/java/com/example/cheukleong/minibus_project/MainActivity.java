@@ -9,25 +9,19 @@ import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
-import android.provider.Settings;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
-import android.widget.ListAdapter;
-import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.provider.Settings.System;
 import android.widget.Toast;
 
 import org.apache.http.HttpEntity;
@@ -44,58 +38,44 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import static com.example.cheukleong.minibus_project.new_GPSTracker.journeyid;
 
 public class MainActivity extends Activity {
     private Button start;
     private TextView show_CarId;
-    private TextView CarID;
-    private EditText ID;
-    private EditText Route;
+    private EditText Car_ID;
     private Spinner route_spinner;
     private ImageButton route_change;
-    private CheckBox insert_trial_checkBox;
-    private String choose_route = "8x";
     private List<String> route_ids = new ArrayList<String>();
-    public static boolean insert_trial_checked = false;
+    public static String choose_route = "8x";
     public final Context context=this;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        ID=findViewById(R.id.Car_ID);
+        Car_ID=findViewById(R.id.Car_ID);
         start=findViewById(R.id.startButton);
         route_spinner=findViewById(R.id.route_spinner);
 
         show_CarId = findViewById(R.id.show_carid);
         route_spinner = findViewById(R.id.route_spinner);
         route_change = findViewById(R.id.route_change);
-        ID.setText(Build.ID);
+        Car_ID.setText(Build.ID);
         route_ids.add("線路");
         route_ids.add("8x");
         route_ids.add("8");
         route_ids.add("8s");
-        route_ids.add("5");
+        route_ids.add("11M");
+        route_ids.add("11");
+        route_ids.add("油站");
         MySpinnerAdapter adapter = new MySpinnerAdapter();
         route_spinner.setAdapter(adapter);
 
@@ -104,7 +84,7 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View view) {
                 Log.d("Gash:","Start");
-                new_GPSTracker.CAR_ID=ID.getText().toString();
+                new_GPSTracker.CAR_ID=Car_ID.getText().toString();
                 startService(new Intent(context, new_GPSTracker.class));
             }
         });
@@ -129,10 +109,11 @@ public class MainActivity extends Activity {
                                         // continue with delete
                                         if(!choose_route.equals(select_route))
                                         {
+
                                             choose_route = select_route;
                                             show_CarId.setText(select_route);
                                             Toast.makeText(context, "已轉" + select_route + "路線", Toast.LENGTH_SHORT).show();
-                                            change_route();
+                                            //change_route(choose_route);
                                         }
                                         else
                                         {
@@ -163,24 +144,17 @@ public class MainActivity extends Activity {
         }
     }
 
-    public void change_route(){
-        if(new_GPSTracker.journeyid!=null)
-        {
-            Log.e("Gash : ","journeyid is not null");
-            delete_jorney(new_GPSTracker.journeyid);
-        }
-        int selected_item = route_spinner.getSelectedItemPosition();
-        new_GPSTracker.go_station = get_stations(selected_item*2+1);
-        new_GPSTracker.back_station = get_stations(selected_item*2+2);
-        new_GPSTracker.CAR_ID=ID.getText().toString();
-        new_GPSTracker.routeid_range=selected_item*2+1;
+    public void change_route(String choose_route){
+        new_GPSTracker.go_station = get_stations(choose_route,1);
+        new_GPSTracker.back_station = get_stations(choose_route,2);
+        new_GPSTracker.CAR_ID=Car_ID.getText().toString();
         new_GPSTracker.init=false;
         new_GPSTracker.journeyid=null;
         new_GPSTracker.Arr_station = -1;
         new_GPSTracker.Pre_station = -2;
     }
 
-    public double[][] get_stations(int routeid) {
+    public double[][] get_stations(String route, int seq) {
         HttpResponse response = null;
         try {
             if (android.os.Build.VERSION.SDK_INT > 9)
@@ -192,7 +166,7 @@ public class MainActivity extends Activity {
             HttpClient client = new DefaultHttpClient();
             HttpGet request = new HttpGet();
             request.setHeader("Content-Type", "application/json");
-            request.setURI(new URI("http://128.199.88.79:3001/api/v1/minibus/getStations/?routeid="+routeid));
+            request.setURI(new URI("http://128.199.88.79:3002/api/v2/minibus/getStations/?route="+route+"&seq="+Integer.toString(seq)));
             response = client.execute(request);
             HttpEntity entity = response.getEntity();
             String text_responese = EntityUtils.toString(entity);
@@ -224,35 +198,6 @@ public class MainActivity extends Activity {
 
         return null;
     };
-
-    public void delete_jorney(String journeyid){
-        Log.d("Gash:","Start delete Journey");
-        DefaultHttpClient client = new DefaultHttpClient();
-        HttpPost httppost = new HttpPost("http://128.199.88.79:3001/api/v1/minibus/deleteJourney");
-        try {
-            // Add your data
-            List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
-            nameValuePairs.add(new BasicNameValuePair("journeyid", journeyid));
-            httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
-            Log.d("httppost: ",httppost.toString());
-
-            try {
-                if (android.os.Build.VERSION.SDK_INT > 9) {
-                    StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-                    StrictMode.setThreadPolicy(policy);
-                }
-                HttpResponse response =client.execute(httppost);
-            } catch (ClientProtocolException e) {
-                Log.e("Error:","ClientProtocol");
-            } catch (IOException e) {
-                Log.e("Error:","IOException");
-            }
-        } catch (UnsupportedEncodingException e) {
-            Log.d("Error:","UnsupportedEncodingException");
-        }
-        Log.d("Gash: ","Finish delete Journey");
-        return ;
-    }
 
 
 
