@@ -41,7 +41,7 @@ public class new_GPSTracker extends Service
     private static final int LOCATION_INTERVAL = 1000;
     private static final float LOCATION_DISTANCE = 10f;
     public static String journeyid = null;
-    public static String routeid;
+    public static String routeid = null;
     public static Long Station_startTime;
     public static Long Station_endTime;
     public static Long Current_time;
@@ -71,6 +71,53 @@ public class new_GPSTracker extends Service
             {22.2837,114.1588}
     };
 
+    //hard code route
+    public static double test_8x_go_station[][]={
+            {22.2837,114.1588},
+            {22.2841445,114.1392645},
+            {22.2836933,114.1366914},
+            {22.26823162,114.12865509},
+            {22.26642942,114.12825444},
+            {22.261973,114.134431},
+            {22.2619,114.1319}
+    };
+
+    public static double test_8x_back_station[][]={
+            {22.2619,114.1319},
+            {22.266572,114.128184},
+            {22.269442,114.129753},
+            {22.2843794,114.13428},
+            {22.2837,114.1588}
+    };
+
+    public static double test_11m_go_station[][]={
+            {22.3155645,114.2643589},
+            {22.323900,114.268589},
+            {22.336946,114.259167},
+            {22.338634,114.262070}
+    };
+
+    public static double test_11m_back_station[][]={
+            {22.338634,114.262070},
+            {22.321541,114.269054},
+            {22.3190835,114.2683805},
+            {22.3155645,114.2643589}
+    };
+
+    public static double test_11_go_station[][]={
+            {22.334909,114.208252},
+            {22.333919,114.221078},
+            {22.316984,114.270832},
+            {22.320528,114.266447}
+    };
+
+    public static double test_11_back_station[][]={
+            {22.320528,114.266447},
+            {22.336934,114.259155},
+            {22.333678,114.236938},
+            {22.334074,114.209304}
+    };
+
     private class LocationListener implements android.location.LocationListener
     {
         Location mLastLocation;
@@ -92,7 +139,7 @@ public class new_GPSTracker extends Service
             Set_Current_time();
             Set_Current_location(location);
             init();
-            update_location();
+//            update_location();
             Check_Arrive_Station();
             Check_Quit_Station();
             Check_Finish_Journey();
@@ -172,6 +219,32 @@ public class new_GPSTracker extends Service
         } catch (IllegalArgumentException ex) {
             Log.d(TAG, "gps provider does not exist " + ex.getMessage());
         }
+
+
+        Thread t = new Thread() {
+            public void run() {
+                while(true)
+                {
+                    Log.e(TAG, "run: ");
+                    try
+                    {
+                        sleep(3000);
+                        Calendar cal = Calendar.getInstance();
+                        Date currentLocalTime = cal.getTime();
+                        Long Current_time = currentLocalTime.getTime();
+                        new_GPSTracker.Current_time = Current_time;
+                        Log.e("New Thread Start","before running time:"+new_GPSTracker.Current_time);
+                        new_GPSTracker.update_location();
+                        Configs.getConfigs();
+                        Log.e("New Thread End", "after running");
+                    }
+                    catch (InterruptedException e)
+                    {}
+                }
+            }
+        };
+
+        t.start();
     }
 
     @Override
@@ -306,23 +379,26 @@ public class new_GPSTracker extends Service
         return current_location.distanceTo(compare_location);
     }
 
-    private void update_location(){
-
+    public static void update_location(){
+        if(routeid==null)
+            return;
         Log.d(TAG, "Start_update_location");
         Map< String, Object > jsonValues = new HashMap< String, Object >();
         jsonValues.put("lat", Current_location.getLatitude());
         jsonValues.put("lng", Current_location.getLongitude());
         JSONObject update_location = new JSONObject(jsonValues);
         DefaultHttpClient client = new DefaultHttpClient();
-        HttpPost httppost = new HttpPost("http://128.199.88.79:3002/api/v2/minibus/updateLocation");
+        HttpPost httppost = new HttpPost("http://128.199.88.79:3002/api/v2/record/addLocationRecord");
         try {
             // Add your data
             List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
+            Log.e(TAG, "upload perm "+update_location.toString()+CAR_ID+MainActivity.choose_route+routeid+Long.toString(Current_time)+Integer.toString(MainActivity.battery_level));
             nameValuePairs.add(new BasicNameValuePair("location", update_location.toString()));
             nameValuePairs.add(new BasicNameValuePair("license", CAR_ID));
             nameValuePairs.add(new BasicNameValuePair("route", MainActivity.choose_route));
             nameValuePairs.add(new BasicNameValuePair("seq", routeid));
-            nameValuePairs.add(new BasicNameValuePair("currenttime",Long.toString(Current_time)));
+            nameValuePairs.add(new BasicNameValuePair("timestamp",Long.toString(Current_time)));
+            nameValuePairs.add(new BasicNameValuePair("batteryLeft",Integer.toString(MainActivity.battery_level)));
             httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
             Log.d("httppost: ",httppost.toString());
 

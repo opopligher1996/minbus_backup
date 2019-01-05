@@ -2,9 +2,11 @@ package com.example.cheukleong.minibus_project;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
@@ -44,6 +46,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 
@@ -53,9 +57,11 @@ public class MainActivity extends Activity {
     private EditText Car_ID;
     private Spinner route_spinner;
     private ImageButton route_change;
+    private TextView show_battery_level;
     private List<String> route_ids = new ArrayList<String>();
-    public static String choose_route = "8x";
+    public static String choose_route = "11";
     public final Context context=this;
+    public static int battery_level;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,7 +74,9 @@ public class MainActivity extends Activity {
         show_CarId = findViewById(R.id.show_carid);
         route_spinner = findViewById(R.id.route_spinner);
         route_change = findViewById(R.id.route_change);
-        Car_ID.setText(Build.ID);
+        show_battery_level = findViewById(R.id.battery_level);
+//        Car_ID.setText(Build.ID);
+        Car_ID.setText("Test_CarConfig");
         route_ids.add("線路");
         route_ids.add("8x");
         route_ids.add("8");
@@ -113,7 +121,7 @@ public class MainActivity extends Activity {
                                             choose_route = select_route;
                                             show_CarId.setText(select_route);
                                             Toast.makeText(context, "已轉" + select_route + "路線", Toast.LENGTH_SHORT).show();
-                                            //change_route(choose_route);
+                                            change_route(choose_route);
                                         }
                                         else
                                         {
@@ -140,18 +148,54 @@ public class MainActivity extends Activity {
 
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1) {
+            if(choose_route.equals("11M")){
+                new_GPSTracker.go_station = new_GPSTracker.test_11m_go_station;
+                new_GPSTracker.back_station = new_GPSTracker.test_11m_back_station;
+            }
+            else if(choose_route.equals("11")){
+                new_GPSTracker.go_station = new_GPSTracker.test_11_go_station;
+                new_GPSTracker.back_station = new_GPSTracker.test_11_back_station;
+            }
+            else{
+                new_GPSTracker.go_station = new_GPSTracker.test_8x_go_station;
+                new_GPSTracker.back_station = new_GPSTracker.test_8x_back_station;
+            }
             start.callOnClick();
         }
+
+        this.registerReceiver(this.mBatInfoReceiver,
+                new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+
     }
 
+    private BroadcastReceiver mBatInfoReceiver = new BroadcastReceiver(){
+        @Override
+        public void onReceive(Context arg0, Intent intent) {
+            // TODO Auto-generated method stub
+            int level = intent.getIntExtra("level", 0);
+            battery_level = level;
+            show_battery_level.setText(String.valueOf(level) + "%");
+        }
+    };
+
     public void change_route(String choose_route){
-        new_GPSTracker.go_station = get_stations(choose_route,1);
-        new_GPSTracker.back_station = get_stations(choose_route,2);
         new_GPSTracker.CAR_ID=Car_ID.getText().toString();
         new_GPSTracker.init=false;
         new_GPSTracker.journeyid=null;
         new_GPSTracker.Arr_station = -1;
         new_GPSTracker.Pre_station = -2;
+        if(choose_route.equals("11M")){
+            new_GPSTracker.go_station = new_GPSTracker.test_11m_go_station;
+            new_GPSTracker.back_station = new_GPSTracker.test_11m_back_station;
+        }
+        else if(choose_route.equals("11")){
+            new_GPSTracker.go_station = new_GPSTracker.test_11_go_station;
+            new_GPSTracker.back_station = new_GPSTracker.test_11_back_station;
+        }
+        else{
+            new_GPSTracker.go_station = new_GPSTracker.test_8x_go_station;
+            new_GPSTracker.back_station = new_GPSTracker.test_8x_back_station;
+        }
     }
 
     public double[][] get_stations(String route, int seq) {
