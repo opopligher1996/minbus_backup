@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.location.Location;
 import android.location.LocationManager;
+import android.nfc.Tag;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.StrictMode;
@@ -91,31 +92,32 @@ public class new_GPSTracker extends Service
     };
 
     public static double test_11m_go_station[][]={
-            {22.3155645,114.2643589},
-            {22.323900,114.268589},
-            {22.336946,114.259167},
-            {22.338634,114.262070}
+            {22.3155480062186,114.2643589},
+            {22.3239136706781,114.2686509332},
+            {22.3369558728058,114.259236763901},
+            {22.3386360145456,114.262161534528}
     };
 
     public static double test_11m_back_station[][]={
-            {22.338634,114.262070},
-            {22.321541,114.269054},
-            {22.3190835,114.2683805},
-            {22.3155645,114.2643589}
+            {22.3386508695072,114.262131520301},
+            {22.3201032027678,114.270050575393},
+            {22.3169961979765,114.270752545671},
+            {22.3154247969597,114.265771784544}
     };
 
     public static double test_11_go_station[][]={
-            {22.334909,114.208252},
-            {22.333919,114.221078},
-            {22.316984,114.270832},
-            {22.320528,114.266447}
+            {22.334882292983,114.208199802671},
+            {22.333872547164,114.221120459639},
+            {22.3169858225788,114.270759645098},
+            {22.3205275205682,114.266430590858}
     };
 
     public static double test_11_back_station[][]={
-            {22.320528,114.266447},
-            {22.336934,114.259155},
-            {22.333678,114.236938},
-            {22.334074,114.209304}
+            {22.3205081059827,114.266441690369},
+            {22.3330777153122,114.262999610027},
+            {22.3397613538672,114.246774213957},
+            {22.3338762522471,114.221025296549},
+            {22.3343050891782,114.210504183526}
     };
 
     private class LocationListener implements android.location.LocationListener
@@ -279,9 +281,9 @@ public class new_GPSTracker extends Service
         double distance_start_point = LocationDistance(Current_location,Compare_location);
         Set_Compare_location(go_station[go_station.length-1][0],go_station[go_station.length-1][1]);
         double distance_end_point = LocationDistance(Current_location,Compare_location);
-        if(distance_start_point<distance_end_point)
+        if(distance_start_point<distance_end_point && routeid==null)
             Set_routeid(1);
-        else
+        else if(routeid==null)
             Set_routeid(2);
         Set_journeyid();
     }
@@ -383,15 +385,20 @@ public class new_GPSTracker extends Service
         if(routeid==null)
             return;
         Log.d(TAG, "Start_update_location");
+        Log.d(TAG, "CAR_ID = "+CAR_ID );
+        Log.d(TAG, "route = "+MainActivity.choose_route);
+        Log.d(TAG, "seq = "+routeid);
         Map< String, Object > jsonValues = new HashMap< String, Object >();
         jsonValues.put("lat", Current_location.getLatitude());
         jsonValues.put("lng", Current_location.getLongitude());
         JSONObject update_location = new JSONObject(jsonValues);
         DefaultHttpClient client = new DefaultHttpClient();
-        HttpPost httppost = new HttpPost("http://128.199.88.79:3002/api/v2/record/addLocationRecord");
+        HttpPost httppost = new HttpPost("http://staging.socif.co:3002/api/v2/record/addLocationRecord");
         try {
             // Add your data
             List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
+
+            Log.e(TAG, "timestamp = "+Long.toString(Current_time));
             Log.e(TAG, "upload perm "+update_location.toString()+CAR_ID+MainActivity.choose_route+routeid+Long.toString(Current_time)+Integer.toString(MainActivity.battery_level));
             nameValuePairs.add(new BasicNameValuePair("location", update_location.toString()));
             nameValuePairs.add(new BasicNameValuePair("license", CAR_ID));

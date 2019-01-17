@@ -49,7 +49,7 @@
         android:layout_below="@+id/Car_ID"
         android:layout_centerHorizontal="true"
         android:gravity="center"
-        android:text="11"
+        android:text="0"
         android:textColor="#095300"
         android:textSize="120dp"
         tools:layout_editor_absoluteX="117dp"

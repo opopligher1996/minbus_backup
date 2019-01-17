@@ -76,7 +76,7 @@ public class MainActivity extends Activity {
         route_change = findViewById(R.id.route_change);
         show_battery_level = findViewById(R.id.battery_level);
 //        Car_ID.setText(Build.ID);
-        Car_ID.setText("Test_CarConfig");
+        Car_ID.setText("Test_RemoteConfig");
         route_ids.add("線路");
         route_ids.add("8x");
         route_ids.add("8");
@@ -86,7 +86,7 @@ public class MainActivity extends Activity {
         route_ids.add("油站");
         MySpinnerAdapter adapter = new MySpinnerAdapter();
         route_spinner.setAdapter(adapter);
-
+        show_CarId.setText(choose_route);
 
         start.setOnClickListener(new View.OnClickListener() {
             @Override

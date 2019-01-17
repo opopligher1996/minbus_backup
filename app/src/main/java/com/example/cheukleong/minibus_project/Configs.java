@@ -35,6 +35,7 @@ public class Configs {
 
     public static void getConfigs(){
         HttpResponse response = null;
+        Log.e(TAG, "getConfigs:" );
         try {
             if (android.os.Build.VERSION.SDK_INT > 9)
             {
@@ -45,20 +46,36 @@ public class Configs {
             HttpClient client = new DefaultHttpClient();
             HttpGet request = new HttpGet();
             request.setHeader("Content-Type", "application/json");
-            request.setURI(new URI("http://128.199.88.79:3002/api/v2/minibus/getCarConfigs/?license="+new_GPSTracker.CAR_ID));
+            request.setURI(new URI("http://staging.socif.co:3002/api/v2/minibus/getCarConfigs/?license="+new_GPSTracker.CAR_ID));
             response = client.execute(request);
             HttpEntity entity = response.getEntity();
             String text_responese = EntityUtils.toString(entity);
             JSONObject obj = new JSONObject(text_responese);
-            boolean set = (Boolean)obj.get("set");
+            JSONObject getResponse = obj.getJSONObject("response");
+            Log.e(TAG, "getConfigs: "+getResponse.getBoolean("set") );
+            boolean set = getResponse.getBoolean("set");
             if(set)
             {
-                new_GPSTracker.routeid = String.valueOf(obj.get("seq"));
-                MainActivity.choose_route = obj.get("route").toString();
-                Configs.ConfigsId = obj.get("upDateTime").toString();
-                Log.e(TAG, obj.get("seq").toString());
-                Log.e(TAG, obj.get("route").toString());
-                Log.e(TAG, obj.get("upDateTime").toString());
+                Log.e(TAG, "enter set" );
+                Log.e(TAG, getResponse.getString("seq"));
+                new_GPSTracker.routeid = getResponse.getString("seq");
+                MainActivity.choose_route = getResponse.getString("route");
+                new_GPSTracker.init=false;
+                new_GPSTracker.journeyid=null;
+                new_GPSTracker.Arr_station = -1;
+                new_GPSTracker.Pre_station = -2;
+                if(MainActivity.choose_route.equals("11M")){
+                    new_GPSTracker.go_station = new_GPSTracker.test_11m_go_station;
+                    new_GPSTracker.back_station = new_GPSTracker.test_11m_back_station;
+                }
+                else if(MainActivity.choose_route.equals("11")){
+                    new_GPSTracker.go_station = new_GPSTracker.test_11_go_station;
+                    new_GPSTracker.back_station = new_GPSTracker.test_11_back_station;
+                }
+                else{
+                    new_GPSTracker.go_station = new_GPSTracker.test_8x_go_station;
+                    new_GPSTracker.back_station = new_GPSTracker.test_8x_back_station;
+                }
             }
 
         } catch (URISyntaxException e) {
