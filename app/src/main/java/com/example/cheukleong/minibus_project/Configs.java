@@ -46,7 +46,7 @@ public class Configs {
             HttpClient client = new DefaultHttpClient();
             HttpGet request = new HttpGet();
             request.setHeader("Content-Type", "application/json");
-            request.setURI(new URI("http://staging.socif.co:3002/api/v2/minibus/getCarConfigs/?license="+new_GPSTracker.CAR_ID));
+            request.setURI(new URI("http://production.socif.co:3002/api/v2/minibus/getCarConfigs/?license="+new_GPSTracker.CAR_ID));
             response = client.execute(request);
             HttpEntity entity = response.getEntity();
             String text_responese = EntityUtils.toString(entity);
@@ -64,6 +64,7 @@ public class Configs {
                 new_GPSTracker.journeyid=null;
                 new_GPSTracker.Arr_station = -1;
                 new_GPSTracker.Pre_station = -2;
+                MainActivity.show_CarId.setText(MainActivity.choose_route);
                 if(MainActivity.choose_route.equals("11M")){
                     new_GPSTracker.go_station = new_GPSTracker.test_11m_go_station;
                     new_GPSTracker.back_station = new_GPSTracker.test_11m_back_station;

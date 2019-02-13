@@ -48,12 +48,14 @@ public class new_GPSTracker extends Service
     public static Long Current_time;
     public static Location Current_location =  new Location("");
     public static Location Compare_location = new Location("");
+    public static Location Pre_location = null;
+    public static Location Sent_location = new Location("");
     // -1 is equal to the minbus don't arrive any station
     public static int Arr_station = -1;
     // -2 is equal to the minibus don't arrive any station before
     public static int Pre_station = -2;
     public static boolean init=false;
-    public static int dans=50;
+    public static int dans=100;
     public int Bat_info=100;
     public static double go_station[][]={
             {22.2837,114.1588},
@@ -141,13 +143,24 @@ public class new_GPSTracker extends Service
             Set_Current_time();
             Set_Current_location(location);
             init();
-//            update_location();
-            Check_Arrive_Station();
-            Check_Quit_Station();
-            Check_Finish_Journey();
+
+            Log.e("Validate Record:", Boolean.toString(Validate_Record()));
+            Log.e("a:",Float.toString(location.getAccuracy()));
+            if(Validate_Record() && init)
+            {
+                Check_Arrive_Station();
+                Check_Quit_Station();
+                Check_Finish_Journey();
+                Set_Pre_location(location.getLatitude(),location.getLongitude());
+                Set_Sent_location(location);
+            }
+
             Log.e("Gash: ","After process onLocationChnaged");
             Log.e("Gash: ","onLocationChanged");
-            Log.e("routeid",routeid);
+            if(routeid ==null)
+                Log.e("routeid","null");
+            else
+                Log.e("routeid",routeid);
             Log.e("init", String.valueOf(init));
             Log.e("Arr_station", String.valueOf(Arr_station));
             Log.e("Pre_station", String.valueOf(Pre_station));
@@ -203,15 +216,15 @@ public class new_GPSTracker extends Service
         Log.e(TAG, "onCreate");
         super.onCreate();
         initializeLocationManager();
-        try {
-            mLocationManager.requestLocationUpdates(
-                    LocationManager.NETWORK_PROVIDER, LOCATION_INTERVAL, LOCATION_DISTANCE,
-                    mLocationListeners[1]);
-        } catch (SecurityException ex) {
-            Log.i(TAG, "fail to request location update, ignore", ex);
-        } catch (IllegalArgumentException ex) {
-            Log.d(TAG, "network provider does not exist, " + ex.getMessage());
-        }
+//        try {
+//            mLocationManager.requestLocationUpdates(
+//                    LocationManager.NETWORK_PROVIDER, LOCATION_INTERVAL, LOCATION_DISTANCE,
+//                    mLocationListeners[1]);
+//        } catch (SecurityException ex) {
+//            Log.i(TAG, "fail to request location update, ignore", ex);
+//        } catch (IllegalArgumentException ex) {
+//            Log.d(TAG, "network provider does not exist, " + ex.getMessage());
+//        }
         try {
             mLocationManager.requestLocationUpdates(
                     LocationManager.GPS_PROVIDER, LOCATION_INTERVAL, LOCATION_DISTANCE,
@@ -231,14 +244,25 @@ public class new_GPSTracker extends Service
                     try
                     {
                         sleep(3000);
-                        Calendar cal = Calendar.getInstance();
-                        Date currentLocalTime = cal.getTime();
-                        Long Current_time = currentLocalTime.getTime();
-                        new_GPSTracker.Current_time = Current_time;
-                        Log.e("New Thread Start","before running time:"+new_GPSTracker.Current_time);
-                        new_GPSTracker.update_location();
+                        if(init)
+                        {
+                            Log.e("Debug: ","send");
+                            Log.d(TAG, "Start_update_location");
+                            Log.d(TAG, "CAR_ID = "+CAR_ID );
+                            Log.d(TAG, "route = "+MainActivity.choose_route);
+                            Log.d(TAG, "seq = "+routeid);
+                        }
+                        else {
+                            Log.e("Debug: ","Not send");
+                        }
+//                        Calendar cal = Calendar.getInstance();
+//                        Date currentLocalTime = cal.getTime();
+//                        Long Current_time = currentLocalTime.getTime();
+//                        new_GPSTracker.Current_time = Current_time;
+//                        Log.e("New Thread Start","before running time:"+new_GPSTracker.Current_time);
+//                        new_GPSTracker.update_location();
                         Configs.getConfigs();
-                        Log.e("New Thread End", "after running");
+//                        Log.e("New Thread End", "after running");
                     }
                     catch (InterruptedException e)
                     {}
@@ -276,16 +300,22 @@ public class new_GPSTracker extends Service
 
         if(init)
             return;
-        init=true;
+        //init=true;
         Set_Compare_location(go_station[0][0],go_station[0][1]);
         double distance_start_point = LocationDistance(Current_location,Compare_location);
         Set_Compare_location(go_station[go_station.length-1][0],go_station[go_station.length-1][1]);
         double distance_end_point = LocationDistance(Current_location,Compare_location);
-        if(distance_start_point<distance_end_point && routeid==null)
+
+        if(distance_start_point<200 && routeid==null) {
             Set_routeid(1);
-        else if(routeid==null)
+            Set_journeyid();
+            init = true;
+        }
+        else if(distance_end_point<200 && routeid==null){
             Set_routeid(2);
-        Set_journeyid();
+            Set_journeyid();
+            init = true;
+        }
     }
 
     public void Check_Arrive_Station(){
@@ -346,15 +376,35 @@ public class new_GPSTracker extends Service
 
     public boolean Check_Quitting(double station[][]){
         if((Arr_station==0 && routeid.equals("1"))||(Arr_station==back_station.length-1 && routeid.equals("2")))
-            dans=150;
+            dans=100;
         Set_Compare_location(station[Arr_station][0],station[Arr_station][1]);
         Log.d("Gash: ","Debug distance = "+LocationDistance(Current_location,Compare_location));
         if(LocationDistance(Current_location,Compare_location)>dans) {
-            dans = 50;
+            dans = 100;
             return true;
         }
-        dans=50;
+        dans=100;
         return false;
+    }
+
+    public boolean Validate_Record(){
+        if(Pre_location==null)
+            return true;
+        double distance = LocationDistance(Current_location,Pre_location);
+        Log.e("Debug: ",Double.toString(distance));
+        if(distance<200) {
+            double accuracy = Current_location.getAccuracy();
+            if(accuracy>20) {
+                Log.e("Debug: ","Invalidate_Record");
+                return false;
+            }
+            Log.e("Debug: ","Validate_Record");
+            return true;
+        }
+        else{
+            Log.e("Debug: ","Invalidate_Record");
+            return false;
+        }
     }
 
     public int Enter_Which_Station(){
@@ -364,33 +414,47 @@ public class new_GPSTracker extends Service
         else
             station = back_station;
         for(int i=0;i<station.length;i++){
+            Log.e(TAG, "station "+i+" = " );
             if((i==0 && routeid.equals("1"))||(i==station.length-1 && routeid.equals("2")))
-                dans=150;
+                dans=100;
             Set_Compare_location(station[i][0],station[i][1]);
             if(LocationDistance(Current_location,Compare_location)<dans)
             {
-                dans = 50;
+                dans = 100;
                 return i;
             }
-            dans = 50;
+            dans = 100;
         }
         return -1;
     }
 
     public double LocationDistance(Location current_location,Location compare_location){
+        Log.e(TAG, "LocationDistance: "+current_location.distanceTo(compare_location));
         return current_location.distanceTo(compare_location);
     }
 
     public static void update_location(){
+        if(init==false)
+            return;
         if(routeid==null)
+            return;
+        if(CAR_ID=="" || CAR_ID==null || CAR_ID==" ")
             return;
         Log.d(TAG, "Start_update_location");
         Log.d(TAG, "CAR_ID = "+CAR_ID );
         Log.d(TAG, "route = "+MainActivity.choose_route);
         Log.d(TAG, "seq = "+routeid);
         Map< String, Object > jsonValues = new HashMap< String, Object >();
-        jsonValues.put("lat", Current_location.getLatitude());
-        jsonValues.put("lng", Current_location.getLongitude());
+        jsonValues.put("lat", Sent_location.getLatitude());
+        jsonValues.put("lng", Sent_location.getLongitude());
+        float accuracy = Sent_location.getAccuracy();
+        float speed = Sent_location.getSpeed();
+        String provider= Sent_location.getProvider();
+        String GPS_PROVIDER = LocationManager.GPS_PROVIDER;
+        Log.e(TAG, "provider: "+provider );
+        Log.e(TAG, "GPS_PROVIDER: "+GPS_PROVIDER);
+        Log.e(TAG, "speed : "+speed );
+        Log.e(TAG, "accuracy : "+accuracy);
         JSONObject update_location = new JSONObject(jsonValues);
         DefaultHttpClient client = new DefaultHttpClient();
         HttpPost httppost = new HttpPost("http://staging.socif.co:3002/api/v2/record/addLocationRecord");
@@ -404,8 +468,11 @@ public class new_GPSTracker extends Service
             nameValuePairs.add(new BasicNameValuePair("license", CAR_ID));
             nameValuePairs.add(new BasicNameValuePair("route", MainActivity.choose_route));
             nameValuePairs.add(new BasicNameValuePair("seq", routeid));
+            nameValuePairs.add(new BasicNameValuePair("speed",Float.toString(speed)));
+            nameValuePairs.add(new BasicNameValuePair("accuracy", Float.toString(accuracy)));
             nameValuePairs.add(new BasicNameValuePair("timestamp",Long.toString(Current_time)));
             nameValuePairs.add(new BasicNameValuePair("batteryLeft",Integer.toString(MainActivity.battery_level)));
+            nameValuePairs.add(new BasicNameValuePair("provider",provider));
             httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
             Log.d("httppost: ",httppost.toString());
 
@@ -444,6 +511,17 @@ public class new_GPSTracker extends Service
     public void Set_Compare_location(double x,double y){
         Compare_location.setLatitude(x);
         Compare_location.setLongitude(y);
+    }
+
+    public void Set_Pre_location(double x,double y){
+        if(Pre_location==null)
+            Pre_location = new Location("");
+        Pre_location.setLatitude(x);
+        Pre_location.setLongitude(y);
+    }
+
+    public void Set_Sent_location(Location location){
+        Sent_location = location;
     }
 
     public void Set_routeid(int go){

@@ -53,13 +53,13 @@ import java.util.List;
 
 public class MainActivity extends Activity {
     private Button start;
-    private TextView show_CarId;
+    public static TextView show_CarId;
     private EditText Car_ID;
     private Spinner route_spinner;
     private ImageButton route_change;
     private TextView show_battery_level;
     private List<String> route_ids = new ArrayList<String>();
-    public static String choose_route = "11";
+    public static String choose_route = "11M";
     public final Context context=this;
     public static int battery_level;
 
@@ -76,7 +76,7 @@ public class MainActivity extends Activity {
         route_change = findViewById(R.id.route_change);
         show_battery_level = findViewById(R.id.battery_level);
 //        Car_ID.setText(Build.ID);
-        Car_ID.setText("Test_RemoteConfig");
+        Car_ID.setText("4104");
         route_ids.add("線路");
         route_ids.add("8x");
         route_ids.add("8");
