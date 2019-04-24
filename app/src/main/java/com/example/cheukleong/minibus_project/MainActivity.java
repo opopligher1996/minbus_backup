@@ -59,7 +59,7 @@ public class MainActivity extends Activity {
     private ImageButton route_change;
     private TextView show_battery_level;
     private List<String> route_ids = new ArrayList<String>();
-    public static String choose_route = "11M";
+    public static String choose_route = "11";
     public final Context context=this;
     public static int battery_level;
 
@@ -76,7 +76,7 @@ public class MainActivity extends Activity {
         route_change = findViewById(R.id.route_change);
         show_battery_level = findViewById(R.id.battery_level);
 //        Car_ID.setText(Build.ID);
-        Car_ID.setText("4104");
+        Car_ID.setText("8722");
         route_ids.add("線路");
         route_ids.add("8x");
         route_ids.add("8");
@@ -93,7 +93,8 @@ public class MainActivity extends Activity {
             public void onClick(View view) {
                 Log.d("Gash:","Start");
                 new_GPSTracker.CAR_ID=Car_ID.getText().toString();
-                startService(new Intent(context, new_GPSTracker.class));
+                Intent intent = new Intent(context, new_GPSTracker.class);
+                startService(intent);
             }
         });
 
@@ -149,14 +150,17 @@ public class MainActivity extends Activity {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1) {
             if(choose_route.equals("11M")){
+                Log.e("Gash","choose 11M");
                 new_GPSTracker.go_station = new_GPSTracker.test_11m_go_station;
                 new_GPSTracker.back_station = new_GPSTracker.test_11m_back_station;
             }
             else if(choose_route.equals("11")){
+                Log.e("Gash","choose 11");
                 new_GPSTracker.go_station = new_GPSTracker.test_11_go_station;
                 new_GPSTracker.back_station = new_GPSTracker.test_11_back_station;
             }
             else{
+                Log.e("Gash","choose 8");
                 new_GPSTracker.go_station = new_GPSTracker.test_8x_go_station;
                 new_GPSTracker.back_station = new_GPSTracker.test_8x_back_station;
             }

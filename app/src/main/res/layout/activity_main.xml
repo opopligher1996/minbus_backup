@@ -20,9 +20,9 @@
         android:inputType="textPersonName"
         android:selectAllOnFocus="false"
         android:textAlignment="center"
+        android:textAppearance="@style/TextAppearance.AppCompat"
         android:textColor="@android:color/background_dark"
         android:textColorHint="@android:color/background_dark"
-        android:textSize="36sp"
         android:textStyle="bold"
         tools:layout_editor_absoluteX="120dp"
         tools:layout_editor_absoluteY="0dp" />

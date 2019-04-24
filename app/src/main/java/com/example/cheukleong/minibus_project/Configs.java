@@ -46,7 +46,7 @@ public class Configs {
             HttpClient client = new DefaultHttpClient();
             HttpGet request = new HttpGet();
             request.setHeader("Content-Type", "application/json");
-            request.setURI(new URI("http://production.socif.co:3002/api/v2/minibus/getCarConfigs/?license="+new_GPSTracker.CAR_ID));
+            request.setURI(new URI("http://minibus-api-prod.scif.co/api/v2/minibus/getCarConfigs/?license="+new_GPSTracker.CAR_ID));
             response = client.execute(request);
             HttpEntity entity = response.getEntity();
             String text_responese = EntityUtils.toString(entity);
